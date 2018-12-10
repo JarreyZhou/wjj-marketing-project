@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjj.application.mapper.video.VideoManagerMapper">
+
+    <!-- 通用查询映射结果 -->
+   <!--  <resultMap id="BaseResultMap" type="com.wjj.application.entity.Test">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="description" property="description" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="number" property="number" />
+        <result column="lifecycle" property="lifecycle" />
+        <result column="dekes" property="dekes" />
+    </resultMap> -->
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, description, create_time AS createTime, update_time AS updateTime, number, lifecycle, dekes
+    </sql>
+    
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <!-- 查询列表 -->
+  <select id="selectVideoManagerList" resultType="com.wjj.application.dto.video.VideoManagerEntityDto" parameterType="com.wjj.application.dto.video.VideoManagerEntityDto">
+  	select
+		id,
+		title,
+		source_from,
+		main_pic,
+		degree,
+		link_path,
+		weichart_letter,
+		weichart_pic_path,
+		actual_num,
+		init_num,
+		type,
+		update_status,
+		create_time
+	FROM
+		video_manager 
+	where 1=1
+	<if test="type!=null and type!=''">
+		and type =#{type}
+	</if>
+	<if test="title!=null and title!=''">
+		and title like concat('%',#{title},'%')
+	</if>
+	<if test="updateStatus!=null and updateStatus!=''">
+		and update_status =#{updateStatus}
+	</if>
+	 <if test="fromTime!=null and fromTime!=''">
+		 	and unix_timestamp(create_time) &gt;=unix_timestamp(#{fromTime})
+	 </if>
+	 <if test="endTime!=null and endTime!=''">
+	 	and  unix_timestamp(create_time) &lt; unix_timestamp(#{endTime})
+	 </if>
+	 order by create_time desc
+	 limit #{pageNo},#{pageSize}
+  </select>
+   
+    <!-- 查询列表 -->
+  <select id="selectVideoManagerListCount" resultType="java.lang.Integer" parameterType="com.wjj.application.dto.video.VideoManagerEntityDto">
+  	select
+		count(0)
+	FROM
+		video_manager 
+	where 1=1
+	<if test="type!=null and type!=''">
+		and type =#{type}
+	</if>
+	<if test="title!=null and title!=''">
+		and title like concat('%',#{title},'%')
+	</if>
+	<if test="updateStatus!=null and updateStatus!=''">
+		and update_status =#{updateStatus}
+	</if>
+	  <if test="fromTime!=null and fromTime!=''">
+		 	and unix_timestamp(create_time) &gt;=unix_timestamp(#{fromTime})
+	 </if>
+	 <if test="endTime!=null and endTime!=''">
+	 	and  unix_timestamp(create_time) &lt; unix_timestamp(#{endTime})
+	 </if>
+  </select>
+   
+   <select id="selectVideoManagerDetail" parameterType="java.lang.Long" resultType="com.wjj.application.dto.video.VideoManagerEntityDto">
+   	select
+		id,
+		title,
+		source_from,
+		main_pic,
+		degree,
+		link_path,
+		weichart_letter,
+		weichart_pic_path,
+		actual_num,
+		init_num,
+		type,
+		update_status
+	FROM
+		video_manager 
+	where id=#{id}
+   </select>
+   
+   
+     <!-- 查询列表 -->
+  <select id="selectVideoManagerListForApp" resultType="com.wjj.application.dto.video.VideoManagerEntityDto" parameterType="com.wjj.application.dto.video.VideoManagerEntityDto">
+  	select
+		id,
+		title,
+		source_from,
+		main_pic,
+		degree,
+		link_path,
+		weichart_letter,
+		weichart_pic_path,
+		actual_num,
+		init_num,
+		type,
+		update_status
+	FROM
+		video_manager 
+	where update_status='2'
+	<if test="type!=null and type!=''">
+		and type =#{type}
+	</if>
+	 order by create_time desc
+	  limit #{pageNo},#{pageSize}
+  </select>
+  
+   
+    <!-- 商城首页-->
+  <select id="selectVideoManagerListForIndex" resultType="com.wjj.application.dto.video.VideoManagerEntityDto" parameterType="com.wjj.application.dto.video.VideoManagerEntityDto">
+  	select
+		id,
+		title,
+		source_from,
+		main_pic,
+		degree,
+		link_path,
+		weichart_letter,
+		weichart_pic_path,
+		actual_num,
+		init_num,
+		type,
+		update_status
+	FROM
+		video_manager 
+	where update_status=2
+	<if test="type!=null and type!=''">
+		and type =#{type}
+	</if>
+	<if test="title!=null and title!=''">
+		and title like concat('%',#{title},'%')
+	</if>
+	<if test="updateStatus!=null and updateStatus!=''">
+		and update_status =#{updateStatus}
+	</if>
+	 <if test="fromTime!=null and fromTime!=''">
+		 	and unix_timestamp(create_time) &gt;=#{fromTime}
+	 </if>
+	 <if test="endTime!=null and endTime!=''">
+	 	and  unix_timestamp(create_time) &lt; #{endTime}
+	 </if>
+	 order by create_time desc
+	 limit #{pageNo},#{pageSize}
+  </select>
+   
+   <!-- 定时取出新实际观看量接口 -->
+   <select id="selectVideoManagerActualNum" resultType="com.wjj.application.entity.video.VideoManagerEntity">
+   		select
+		id,
+		actual_num
+	FROM
+		video_manager 
+   </select>
+   
+   <!-- 批量跟新实际观看量 -->
+   <update id="updateVideoManagerActualNum" parameterType="java.util.List">
+    <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+        update video_manager
+        <set>
+            actual_num=actual_num+#{item.actualNum}
+        </set>
+        where id = #{item.id}
+    </foreach>      
+	</update>
+   
+
+   
+</mapper>

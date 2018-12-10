@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjj.application.mapper.video.VideoArticleEntityMapper">
+
+    <!-- 通用查询映射结果 -->
+   <!--  <resultMap id="BaseResultMap" type="com.wjj.application.entity.Test">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="description" property="description" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="number" property="number" />
+        <result column="lifecycle" property="lifecycle" />
+        <result column="dekes" property="dekes" />
+    </resultMap> -->
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, description, create_time AS createTime, update_time AS updateTime, number, lifecycle, dekes
+    </sql>
+	<delete id="deleteByVideoArticleEntityByVideo" parameterType="java.lang.Long">
+		delete from video_article where video_id =#{videoId}
+	</delete> 
+   <select id="slectVideoArticleEntityByVideo" parameterType="java.lang.Long" resultType="com.wjj.application.entity.video.VideoArticleEntity">
+	   	select
+			a.id,
+			a.video_id,
+			a.article_id,
+			a.article_title,
+			b.real_read+b.dummy_read as real_read,
+			a.pic_path,
+			a.source_from
+		FROM
+			video_article  a ,health_infomation b
+	  where a.article_id=b.id
+	and a.video_id =#{videoId}
+   </select>
+   
+   <!-- 查询所有的文章 -->
+   <select id="selectVideoArticleList" parameterType="com.wjj.application.dto.video.VideoArticleEntityDto" resultType="com.wjj.application.entity.video.VideoArticleEntity">
+   		select
+			id as article_id ,
+		    title_name  as article_title,
+			pic_path,
+      		dummy_read+real_read as real_read,
+      		source_from 
+		FROM
+			health_infomation
+		where groups='1' and info_status='2'
+		<if test="articleTitle!=null and articleTitle!=''">
+			and title_name like concat('%',#{articleTitle},'%')
+		</if>
+   		limit #{pageNo},#{pageSize}
+   </select>
+   <!-- -->
+   <select id="selectVideoArticleListCount" parameterType="com.wjj.application.dto.video.VideoArticleEntityDto" resultType="java.lang.Integer">
+   		select
+			count(0)
+		FROM
+			health_infomation
+		where groups='1' and info_status='2'
+		<if test="articleTitle!=null and articleTitle!=''">
+			and title_name like concat('%',#{articleTitle},'%')
+		</if>
+   </select>
+   
+   <update id="updateVideoArticleByHealthInfomation" parameterType="com.wjj.application.dto.infomation.HealthInformationDto">
+   			update video_article
+		 <trim prefix="set" suffixOverrides=",">
+		   <if test="titleName!=null and titleName!=''">
+		  	article_title=#{titleName},
+		  </if>
+		   <if test="picPath!=null and picPath!=''">
+		  	pic_path=#{picPath},
+		  </if>
+		   <if test="realRead!=null and realRead!=''">
+		  	real_read=(#{realRead}+#{dummyRead}),
+		  </if>
+		   <if test="sourceFrom!=null and sourceFrom!=''">
+		  	source_from=#{sourceFrom},
+		  </if>
+		 </trim>
+ 		WHERE article_id=#{id}
+   </update>
+   
+   <!-- 同步更新观看量 -->
+   <update  id="updateRealReadByHealthInfomation" parameterType="java.util.List">
+   	<foreach collection="list" item="item" separator=";">
+   		
+	   		update video_article
+				set 
+			  	real_read=real_read+#{item.realRead}
+	 		WHERE article_id=#{item.id}
+     </foreach>
+   </update>
+   
+    <select id="slectVideoArticleEntityByVideoNew"  resultType="com.wjj.application.entity.video.VideoArticleEntity">
+   	  select
+			id as article_id ,
+		    title_name  as article_title,
+			pic_path,
+      		dummy_read+real_read as real_read,
+      		source_from 
+		FROM
+			health_infomation
+		where groups='1' and info_status='2'
+	 limit 0,6
+   </select>
+   
+   <!-- 资讯下架文章删除 -->
+   <delete id="deleteArticleById" parameterType="java.lang.String">
+   	delete from video_article where article_id=#{articleId}
+   </delete>
+   
+</mapper>

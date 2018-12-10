@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjj.application.mapper.infomation.HealthInfomationMapper">
+
+    <!-- 通用查询映射结果 -->
+   <!--  <resultMap id="BaseResultMap" type="com.wjj.application.entity.RelGoods">
+        <result column="rel_id" property="relId" />
+        <result column="goods_name" property="goodsName" />
+        <result column="ico_path" property="icoPath" />
+        <result column="body_type" property="bodyType" />
+        <result column="sex" property="sex" />
+        <result column="sale_price" property="salePrice" />
+        <result column="line_price" property="linePrice" />
+        <result column="total_num" property="totalNum" />
+        <result column="sale_num" property="saleNum" />
+        <result column="goods_id" property="goodsId" />
+         <result column="max_price" property="maxPrice" />
+    </resultMap> -->
+    
+    
+    <select id="selectHealthInfomationList" parameterType="com.wjj.application.dto.infomation.HealthInformationDto" resultType="com.wjj.application.dto.infomation.HealthInformationDto">
+    	SELECT
+			a.id,
+			a.title_name,
+			a.groups,
+			a.type_id,
+			a.source_from,
+			a.wechart,
+			a.dummy_read,
+			a.dummy_like,
+			a.real_read,
+			a.real_like,
+			a.pic_path,
+			a.link_path,
+			a.create_user,
+			a.create_time,
+			a.info_status,
+			b. NAME AS type_name
+		FROM
+			health_infomation a
+		LEFT JOIN health_infomation_type b ON a.type_id = b.id
+		where 1=1
+    	<if test="titleName!=null and titleName!=''">
+    		and a.title_name like concat('%',#{titleName},'%')
+    	</if>
+    	<if test="groups!=null and groups!=''">
+    		and a.groups =#{groups}
+    	</if>
+    	<if test="typeId!=null and typeId!=''">
+    		and a.type_id =#{typeId}
+    	</if>
+    	<if test="infoStatus!=null and infoStatus!=''">
+    		and a.info_status =#{infoStatus}
+    	</if>
+    	order by create_time desc 
+    	limit #{pageNo},#{pageSize}
+    </select>
+  
+    <select id="selectHealthInfomationListCount" parameterType="com.wjj.application.dto.infomation.HealthInformationDto" resultType="java.lang.Integer">
+    	SELECT
+			count(0)
+		FROM
+			health_infomation a
+		LEFT JOIN health_infomation_type b ON a.type_id = b.id
+		where 1=1
+    	<if test="titleName!=null and titleName!=''">
+    		and a.title_name like concat('%',#{titleName},'%')
+    	</if>
+    	<if test="groups!=null and groups!=''">
+    		and a.groups =#{groups}
+    	</if>
+    	<if test="typeId!=null and typeId!=''">
+    		and a.type_id =#{typeId}
+    	</if>
+    	<if test="infoStatus!=null and infoStatus!=''">
+    		and a.info_status =#{infoStatus}
+    	</if>
+    	limit #{pageNo},#{pageSize}
+    </select>
+  
+    <update id="updateHealthInfomation" parameterType="com.wjj.application.dto.infomation.HealthInformationDto">
+    	   update  health_infomation
+       <trim prefix="set" suffixOverrides=",">  
+       <if test="titleName!=null and titleName!=''">
+        	title_name= #{titleName},
+       </if>
+        <if test="groups!=null and groups!=''">
+        	groups= #{groups},
+       </if>
+      <if test="typeId!=null and typeId!=''">
+       		 type_id = #{typeId},
+     </if>
+      <if test="sourceFrom!=null and sourceFrom!=''">
+        source_from = #{sourceFrom},
+     </if>
+      <if test="wechart!=null and wechart!=''">
+        	wechart = #{wechart},
+     </if>
+      <if test="dummyRead!=null and dummyRead!=''">
+        dummy_read = #{dummyRead},
+     </if>
+      <if test="dummyLike!=null and dummyLike!=''">
+        dummy_like = #{dummyLike},
+     </if>
+      <if test="realRead!=null and realRead!=''">
+        real_read = #{realRead},
+     </if>
+      <if test="realLike!=null and realLike!=''">
+        real_like = #{realLike},
+     </if>
+      <if test="picPath!=null and picPath!=''">
+        pic_path = #{picPath},
+     </if>
+      <if test="linkPath!=null and linkPath!=''">
+        link_path = #{linkPath},
+     </if>
+      <if test="infoStatus!=null and infoStatus!=''">
+        info_status = #{infoStatus},
+     </if>
+     </trim>
+	where id = #{id}
+    </update>
+    
+    <delete id="delHealthInformationDto" parameterType="java.lang.String">
+    	delete from health_infomation where id=#{id} 
+    </delete>
+    
+    <!-- 查看详情 -->
+     <select id="selectHealthInformationById" parameterType="java.lang.String" resultType="com.wjj.application.dto.infomation.HealthInformationDto">
+     select
+			a.id,
+			a.title_name,
+			a.groups,
+			a.type_id,
+			a.source_from,
+			a.wechart,
+			a.dummy_read,
+			a.dummy_like,
+			a.real_read,
+			a.real_like +a.dummy_like as real_like,
+			a.pic_path,
+			a.link_path,
+			a.create_user,
+			a.create_time,
+			a.info_status
+		FROM
+			health_infomation a
+		where a.id=#{id}
+     </select>
+     
+     <!-- 首页查看推荐资讯列表 -->
+    <select id="selectRecondInfomation" parameterType="com.wjj.application.dto.index.InfomationIndexDto" resultType="com.wjj.application.dto.infomation.HealthInformationDto">
+    	SELECT
+    	a.id,
+		a.title_name,
+		a.groups,
+		a.source_from,
+		a.dummy_read +a.real_read   as real_read,
+		a.dummy_like +a.real_like  as real_like,
+		a.pic_path,
+		a.link_path
+	FROM
+		health_infomation a
+	WHERE
+		a.info_status = '2'
+	ORDER BY id DESC
+	 limit #{pageNo},#{pageSize}
+    </select>
+     <select id="selectRecondInfomationCount" parameterType="com.wjj.application.dto.index.InfomationIndexDto" resultType="java.lang.Integer">
+    	SELECT
+		count(0)
+	FROM
+		health_infomation a
+	WHERE
+		a.info_status = '2'
+	ORDER BY id DESC
+    </select>
+    
+    <!-- 热门资讯 -->
+    <select id="selectHotInfomation"  parameterType="com.wjj.application.dto.index.InfomationIndexDto" resultType="com.wjj.application.dto.infomation.HealthInformationDto">
+    	select
+    	a.id,
+		a.title_name,
+		a.groups,
+		a.source_from,
+		a.dummy_read +a.real_read   as real_read,
+		a.dummy_like +a.real_like  as real_like,
+		a.pic_path,
+		a.link_path
+	FROM
+		health_infomation a
+	WHERE
+		a.info_status = '2'
+	ORDER BY real_read DESC
+	 limit #{pageNo},#{pageSize}
+    </select>
+    
+     <select id="selectHotInfomationCount"  parameterType="com.wjj.application.dto.index.InfomationIndexDto" resultType="java.lang.Integer">
+	    select
+			count(0)
+		from
+			health_infomation a
+		WHERE
+			a.info_status = '2'
+		ORDER BY real_read DESC
+    </select>
+    
+    <select id="selectHealthInfomationId" resultType="com.wjj.application.entity.information.HealthInfomation">
+    select
+		a.id,
+		a.real_read,
+		a.real_like
+	FROM
+		health_infomation a
+    </select>
+   
+   
+    <!-- 批量跟新实际观看量 -->
+   <update id="updateHealthInfomationActualNum" parameterType="java.util.List">
+    <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+        update health_infomation
+        <set>
+            real_read=real_read+#{item.realRead},
+            real_like=real_like+#{item.realLike},
+        </set>
+        where id = #{item.id}
+    </foreach>      
+	</update>
+	<!-- 跟新 -->
+	<update id="">
+	
+	</update>
+   
+</mapper>

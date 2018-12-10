@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjj.application.mapper.pennyRob.MkStandardMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wjj.application.entity.pennyRob.MkStandard">
+        <id column="id" property="id" />
+        <result column="spu_id" property="spuId" />
+        <result column="name" property="name" />
+        <result column="sort" property="sort" />
+        <result column="create_by" property="createBy" />
+        <result column="create_date" property="createDate" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_date" property="updateDate" />
+        <result column="remarks" property="remarks" />
+        <result column="del_flag" property="delFlag" />
+        <result column="version" property="version" />
+    </resultMap>
+    
+    <resultMap id="SkuResultMap" type="com.wjj.application.entity.pennyRob.MkStandardExt" >
+        <id column="id" property="id" />
+        <result column="spu_id" property="spuId" />
+        <result column="name" property="name" />
+        <result column="sort" property="sort" />
+        <result column="create_by" property="createBy" />
+        <result column="create_date" property="createDate" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_date" property="updateDate" />
+        <result column="remarks" property="remarks" />
+        <result column="del_flag" property="delFlag" />
+        <result column="version" property="version" />
+    	<collection property="mkStandardAttrList" ofType="com.wjj.application.entity.pennyRob.MkStandardAttr">
+   		  	<id column="sub_id" property="id" />
+	        <result column="standard_id" property="standardId" />
+	        <result column="attr_value" property="attrValue" />
+	        <result column="sub_sort" property="sort" />
+	        <result column="sub_create_by" property="createBy" />
+	        <result column="sub_create_date" property="createDate" />
+	        <result column="sub_update_by" property="updateBy" />
+	        <result column="sub_update_date" property="updateDate" />
+	        <result column="sub_remarks" property="remarks" />
+	        <result column="sub_del_flag" property="delFlag" />
+	        <result column="sub_version" property="version" />
+    	</collection>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, spu_id AS spuId, name, sort, create_by AS createBy, create_date AS createDate, update_by AS updateBy, update_date AS updateDate, remarks, del_flag AS delFlag, version
+    </sql>
+    
+    <select id="selectSku" parameterType="int" resultMap="SkuResultMap">
+        SELECT
+            a.*,
+            b.id AS sub_id,
+            b.standard_id,
+            b.attr_value,
+            b.sort AS sub_sort,
+            b.create_by AS sub_create_by,
+            b.create_date AS sub_create_date,
+            b.update_by AS sub_update_by,
+            b.update_date AS sub_update_date,
+            b.remarks AS sub_remarks,
+            b.del_flag AS sub_del_flag,
+            b.version AS sub_version
+        FROM
+            mk_standard a,
+            mk_standard_attr b
+        WHERE
+            a.id = b.standard_id and b.del_flag != 1
+        AND a.spu_id = #{id}
+    </select>
+
+    <insert id="insertBatchStandard" useGeneratedKeys="true" parameterType="java.util.List">
+        insert into mk_standard(
+          spu_id , name, sort, create_by , create_date , update_by , update_date , remarks, del_flag , version
+        ) values
+        <foreach collection="list" item="item" index="index" separator=",">
+        (
+        #{item.spuId},
+        #{item.name},
+        #{item.sort},
+        #{item.createBy},
+        #{item.createDate},
+        #{item.updateBy},
+        #{item.updateDate},
+        #{item.remarks},
+        #{item.delFlag},
+        #{item.version}
+        )
+        </foreach>
+    </insert>
+</mapper>

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.wjj.application.mapper.pennyRob.MkActivitySponsorMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.wjj.application.entity.pennyRob.MkActivitySponsor">
+		<id column="id" property="id" />
+		<result column="sponsor_code" property="sponsorCode" />
+		<result column="form_id" property="formId" />
+		<result column="open_id" property="openId" />
+		<result column="user_id" property="userId" />
+		<result column="nickname" property="nickname" />
+		<result column="phone" property="phone" />
+		<result column="rob_count" property="robCount" />
+		<result column="spu_id" property="spuId" />
+		<result column="sku_id" property="skuId" />
+		<result column="status" property="status" />
+		<result column="order_status" property="orderStatus" />
+		<result column="order_no" property="orderNo" />
+		<result column="order_trade_no" property="orderTradeNo" />
+		<result column="order_remarks" property="orderRemarks" />
+		<result column="create_by" property="createBy" />
+		<result column="create_date" property="createDate" />
+		<result column="update_by" property="updateBy" />
+		<result column="update_date" property="updateDate" />
+		<result column="remarks" property="remarks" />
+		<result column="del_flag" property="delFlag" />
+		<result column="version" property="version" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, sponsor_code AS sponsorCode, user_id AS userId,
+		nickname, phone,
+		rob_count AS robCount, spu_id AS spuId, sku_id AS
+		skuId,status,
+		order_status AS orderStatus, order_no AS orderNo,
+		create_by AS
+		createBy, create_date AS createDate, update_by AS
+		updateBy,
+		update_date AS updateDate, remarks, del_flag AS delFlag,
+		version
+	</sql>
+
+	<select id="selectSponsorSpuCount"
+		parameterType="com.wjj.application.entity.pennyRob.MkActivitySponsor"
+		resultType="java.lang.Integer">
+		select
+		count(*)
+		FROM
+		mk_activity_sponsor
+		where 1=1
+		<if test="activityId!=null and activityId!=''">
+			and activity_id =#{activityId}
+		</if>
+		<if test="userId !=null and userId !=''">
+			and user_id =#{userId}
+		</if>
+		<if test="spuId !=null and spuId !=''">
+			and spu_id =#{spuId}
+		</if>
+	</select>
+
+
+
+    <select id="myActivityList" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+        SELECT
+		a.id as sponsorId,
+        a.create_date as createDate,
+        d.guige_json as guigeJson,
+        c.needrob_count as needrobCount,
+        c.price,
+        a.rob_count as robCount,
+        b.help_indate as helpIndate,
+        a.status,
+		d.spu_id as spuId,
+		d.id as skuId,
+        c.name,
+		c.good_id as goodId
+        FROM
+        mk_activity_sponsor a,
+        mk_activity b,
+        mk_goods_spu c,
+        mk_goods_sku d
+        WHERE
+        a.activity_id = b.id and d.spu_id = c.id
+        AND a.spu_id = c.id
+        AND a.user_id = #{userId}
+		AND a.del_flag != 1
+        <if test="status != null and status != 0">
+            AND a.status = #{status}
+        </if>
+		group by a.id order by a.create_date desc
+        limit #{index},#{pageSize}
+    </select>
+
+      <select id="selectSponsorActivityCount" parameterType="com.wjj.application.entity.pennyRob.MkActivitySponsor" resultType="java.lang.Integer">
+		select
+		count(*)
+		FROM
+		mk_activity_sponsor
+		where 1=1
+		<if test="activityId!=null and activityId!=''">
+			and activity_id =#{activityId}
+		</if>
+		<if test="userId !=null and userId !=''">
+			and user_id =#{userId}
+		</if>
+	</select>
+	<select id="selectPageList" resultType="com.wjj.application.dto.pennyRob.MkActivitySponsorDTO"
+		parameterType="com.wjj.application.dto.pennyRob.MkActivitySponsorDTO">
+		select
+		<include refid="Base_Column_List" />
+		from mk_activity_sponsor
+		where 1=1
+			<if test="activityId!=null and activityId!=''">
+				and activity_id =#{activityId}
+			</if>
+			<if test="spuId!=null and spuId!=''">
+				and spu_id =#{spuId}
+			</if>
+			<if test="nicknameAndPhone != null and nicknameAndPhone !=''">
+				and nickname = #{nicknameAndPhone} or phone = #{nicknameAndPhone}
+			</if>
+			<if test="sponsorCode != null and sponsorCode !=''">
+				and sponsor_code = #{sponsorCode}
+			</if>
+			<if test="status != null and status !=''">
+				and status = #{status}
+			</if>
+			<if test="orderStatus != null and orderStatus !=''">
+				and order_status = #{orderStatus}
+			</if>
+		order by create_date desc
+		<if test="pageSize != null and pageSize > 0">
+			limit #{limit} , #{pageSize}
+		</if>
+	</select>
+
+	<select id="selectPageCount" resultType="int"
+		parameterType="com.wjj.application.dto.pennyRob.MkActivitySponsorDTO">
+		select count(1)
+		from mk_activity_sponsor
+		where 1=1
+			<if test="activityId!=null and activityId!=''">
+				and activity_id =#{activityId}
+			</if>
+			<if test="spuId!=null and spuId!=''">
+				and spu_id =#{spuId}
+			</if>
+			<if test="nicknameAndPhone != null and nicknameAndPhone !=''">
+				and nickname = #{nicknameAndPhone} or phone = #{nicknameAndPhone}
+			</if>
+			<if test="sponsorCode != null and sponsorCode !=''">
+				and sponsor_code = #{sponsorCode}
+			</if>
+			<if test="status != null and status !=''">
+				and status = #{status}
+			</if>
+			<if test="orderStatus != null and orderStatus !=''">
+				and order_status = #{orderStatus}
+			</if>
+	</select>
+
+	<select id="orderPageList" parameterType="com.wjj.application.util.PageVO" resultType="java.util.HashMap">
+		select
+		activity_id as activityId,
+		order_no as orderNo,
+		user_id as userId,
+		nickname,
+		phone,
+		order_status as orderStatus,
+		create_date as createDate
+		from mk_activity_sponsor limit #{index},#{pageSize}
+	</select>
+
+	<select id="orderPageCount" parameterType="com.wjj.application.util.PageVO" resultType="int">
+		select
+		count (1)
+		from mk_activity_sponsor
+	</select>
+
+	<select id="orderConditionPageList" parameterType="com.wjj.application.dto.pennyRob.MkActivitySponsorDTO" resultType="com.wjj.application.dto.pennyRob.MkActivitySponsorDTO">
+		select
+		<include refid="Base_Column_List"></include>
+		from mk_activity_sponsor
+		<where>
+			<if test=" activityId !=null and activityId != ''">
+				and activity_id = #{activityId}
+			</if>
+			<if test=" orderNo !=null and orderNo != ''">
+				and order_no = #{orderNo}
+			</if>
+			<if test=" userId !=null and userId != ''">
+				and (user_id = #{userId} or nickname = #{userId})
+			</if>
+			<if test=" phone !=null and phone != ''">
+				and phone = #{phone}
+			</if>
+			<if test=" spuId !=null and spuId != ''">
+				and spu_id = #{spuId}
+			</if>
+			<if test=" orderStatus !=null and orderStatus != ''">
+				and order_status = #{orderStatus}
+			</if>
+		</where>
+		limit #{limit},#{pageSize}
+	</select>
+
+	<select id="orderConditionCountList" parameterType="com.wjj.application.dto.pennyRob.MkActivitySponsorDTO" resultType="int">
+		select
+		count (1)
+		from mk_activity_sponsor
+		<where>
+			<if test=" activityId !=null and activityId != ''">
+				and activity_id = #{activityId}
+			</if>
+			<if test=" orderNo !=null and orderNo != ''">
+				and order_no = #{orderNo}
+			</if>
+			<if test=" userId !=null and userId != ''">
+				and (user_id = #{userId} or nickname = #{userId})
+			</if>
+			<if test=" phone !=null and phone != ''">
+				and phone = #{phone}
+			</if>
+			<if test=" spuId !=null and spuId != ''">
+				and spu_id = #{spuId}
+			</if>
+			<if test=" orderStatus !=null and orderStatus != ''">
+				and order_status = #{orderStatus}
+			</if>
+		</where>
+	</select>
+
+
+
+</mapper>

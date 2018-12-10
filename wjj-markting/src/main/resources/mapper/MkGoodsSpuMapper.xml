@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.wjj.application.mapper.pennyRob.MkGoodsSpuMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wjj.application.entity.pennyRob.MkGoodsSpu">
+        <id column="id" property="id" />
+        <result column="activity_id" property="activityId" />
+        <result column="name" property="name" />
+        <result column="good_id" property="goodId" />
+        <result column="type_id" property="typeId" />
+        <result column="type_name" property="typeName" />
+        <result column="price" property="price" />
+        <result column="needrob_count" property="needrobCount" />
+        <result column="init_count" property="initCount" />
+        <result column="sort" property="sort" />
+        <result column="sponsor_limit" property="sponsorLimit" />
+        <result column="order_count" property="orderCount" />
+        <result column="stock" property="stock" />
+        <result column="remain_stock" property="remainStock" />
+        <result column="sponsor_count" property="sponsorCount" />
+        <result column="rob_count" property="robCount" />
+        <result column="status" property="status" />
+        <result column="create_by" property="createBy" />
+        <result column="create_date" property="createDate" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_date" property="updateDate" />
+        <result column="remarks" property="remarks" />
+        <result column="del_flag" property="delFlag" />
+        <result column="version" property="version" />
+    </resultMap>
+
+
+	<select id="selectSpu"
+		resultType="com.wjj.application.entity.pennyRob.MkGoodsSpuVO"
+		parameterType="int">
+		select
+		<include refid="Base_Column_List"></include>
+		from mk_goods_spu where id = #{id}
+	</select>
+
+	<select id="selectPageList" resultType="com.wjj.application.dto.pennyRob.MkGoodsSpuDTO"
+		parameterType="com.wjj.application.dto.pennyRob.MkGoodsSpuDTO">
+		select
+		<include refid="Base_Column_List" />
+		from mk_goods_spu
+		where 1=1
+			<if test="activityId != null and activityId !=''">
+				and activity_id = #{activityId}
+			</if>
+			<if test="goodId != null and goodId !=''">
+				and good_id = #{goodId}
+			</if>
+			<if test="name != null and name !=''">
+				and name = #{name}
+			</if>
+			<if test="typeName != null and typeName !=''">
+				and type_name = #{typeName}
+			</if>
+			<if test="status != null and status !=''">
+				and status = #{status}
+			</if>
+            <if test="updateStart != null and updateStart !=''">
+                and update_date >= #{updateStart,jdbcType=TIMESTAMP}
+            </if>
+            <if test="updateEnd != null and updateEnd !=''">
+                and #{updateEnd,jdbcType=TIMESTAMP} >= update_date
+            </if>
+		order by sort desc
+		<if test="pageSize != null and pageSize > 0">
+			limit #{limit} , #{pageSize}
+		</if>
+	</select>
+
+	<select id="selectPageCount" resultType="int"
+		parameterType="com.wjj.application.dto.pennyRob.MkGoodsSpuDTO">
+		select count(1)
+		from mk_goods_spu
+		where 1=1
+		<if test="activityId != null and activityId !=''">
+			and activity_id = #{activityId}
+		</if>
+		<if test="goodId != null and goodId !=''">
+			and good_id = #{goodId}
+		</if>
+		<if test="name != null and name !=''">
+			and name = #{name}
+		</if>
+		<if test="typeName != null and typeName !=''">
+			and type_name = #{typeName}
+		</if>
+		<if test="status != null and status !=''">
+			and status = #{status}
+		</if>
+		<if test="updateStart != null and updateStart !=''">
+			and update_date >= #{updateStart,jdbcType=TIMESTAMP}
+		</if>
+		<if test="updateEnd != null and updateEnd !=''">
+			and #{updateEnd,jdbcType=TIMESTAMP} >= update_date
+		</if>
+	</select>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, activity_id AS activityId, name,good_id AS goodId, type_id AS typeId, type_name AS typeName, price, needrob_count AS needrobCount, init_count AS initCount, sort, sponsor_limit AS sponsorLimit, order_count AS orderCount, stock, remain_stock AS remainStock, sponsor_count AS sponsorCount, rob_count AS robCount, status, create_by AS createBy, create_date AS createDate, update_by AS updateBy, update_date AS updateDate, remarks, del_flag AS delFlag, version
+    </sql>
+
+    <select id="snatchCountList" resultType="int">
+    	select count(1) from mk_goods_spu where activity_id = (select id from mk_activity where status = 3);
+    </select>
+
+    <select id="snatchPageList" resultType="com.wjj.application.dto.pennyRob.MkGoodsSpuDTO" parameterType="com.wjj.application.util.PageVO">
+    	select
+    	<include refid="Base_Column_List"></include>
+    	from mk_goods_spu where activity_id = (select id from mk_activity where status = 3) limit #{index},#{pageSize};
+    </select>
+
+    <select id="comingCountList" resultType="int">
+    	select count(1) from mk_goods_spu where activity_id = (select id from mk_activity where status = 2 ORDER BY start_time limit 0,1);
+    </select>
+
+    <select id="comingPageList" resultType="com.wjj.application.dto.pennyRob.MkGoodsSpuDTO" parameterType="com.wjj.application.util.PageVO">
+    	select
+    	<include refid="Base_Column_List"></include>
+    	from mk_goods_spu where activity_id = (select id from mk_activity where status = 2 ORDER BY start_time limit 0,1) limit #{index},#{pageSize};
+    </select>
+
+	<select id="moreGoods" resultType="com.wjj.application.dto.pennyRob.MkGoodsSpuDTO" parameterType="int">
+		select
+		<include refid="Base_Column_List"/>
+		from mk_goods_spu
+		where 1=1
+			<if test="activityId != null and activityId !=''">
+				and activity_id = #{activityId}
+			</if>
+		order by rob_count desc
+	</select>
+
+
+
+
+
+
+
+
+
+
+    <select id="selectSpu" resultType="com.wjj.application.entity.pennyRob.MkGoodsSpuVO" parameterType="int">
+    	select
+    	<include refid="Base_Column_List"></include>
+    	from mk_goods_spu where id = #{id}
+    </select>
+
+
+</mapper>

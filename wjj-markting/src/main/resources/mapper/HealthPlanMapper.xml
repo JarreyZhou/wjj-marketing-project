@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjj.application.mapper.infomation.HealthPlanMapper">
+
+    <!-- 通用查询映射结果 -->
+   <!--  <resultMap id="BaseResultMap" type="com.wjj.application.entity.RelGoods">
+        <result column="rel_id" property="relId" />
+        <result column="goods_name" property="goodsName" />
+        <result column="ico_path" property="icoPath" />
+        <result column="body_type" property="bodyType" />
+        <result column="sex" property="sex" />
+        <result column="sale_price" property="salePrice" />
+        <result column="line_price" property="linePrice" />
+        <result column="total_num" property="totalNum" />
+        <result column="sale_num" property="saleNum" />
+        <result column="goods_id" property="goodsId" />
+         <result column="max_price" property="maxPrice" />
+    </resultMap> -->
+    <select id="selectHealthPlanForList" parameterType="com.wjj.application.dto.infomation.HealthPlanDto" resultType="com.wjj.application.entity.information.HealthPlan">
+		select
+			id,
+			name,
+			from_time,
+			end_time,
+			type,
+			sex,
+			health_status,
+			create_user,
+			update_date
+		FROM
+			health_plan
+		where 1=1
+		<if test="name!=null and name!=''">
+			and name like CONCAT ('%',#{name},'%')
+		</if>
+		<if test="healthStatus!=null and healthStatus!=''">
+			and health_status =#{healthStatus}
+		</if>
+		<if test="type!=null and  type!=''">
+			and type =#{type}
+		</if>
+		limit #{pageNo},#{pageSize}
+    </select>
+    
+      <select id="selectHealthPlanForListCount" parameterType="com.wjj.application.dto.infomation.HealthPlanDto" resultType="java.lang.Integer">
+		select
+			count(*)
+		FROM
+			health_plan
+		where 1=1
+		<if test="name!=null and name!=''">
+			and name like CONCAT ('%',#{name},'%')
+		</if>
+		<if test="healthStatus!=null and healthStatus!=''">
+			and health_status =#{healthStatus}
+		</if>
+		<if test="type!=null and  type!=''">
+			and type =#{type}
+		</if>
+    </select>
+
+
+	<update id="updateHealthPlanForUp" parameterType="java.lang.Long">
+		update health_plan set health_status='2' where id=#{id}
+	</update>
+	
+	<update id="updateHealthPlanForDown" parameterType="java.lang.Long">
+		update health_plan set health_status='3' where id=#{id}
+	</update>
+	
+	
+	<select id="selectHealthPlanById" parameterType="java.lang.Long" resultType="com.wjj.application.dto.infomation.HealthPlanDto">
+		select
+				id,
+				name,
+				from_time,
+				end_time,
+				type,
+				sex,
+				health_status,
+				create_user,
+				update_date,
+				detail
+			FROM
+				health_plan
+			where id=#{id}
+	</select>
+	
+   
+</mapper>

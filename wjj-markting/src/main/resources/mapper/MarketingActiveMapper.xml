@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjj.application.mapper.marketing.MarketingActiveMapper">
+
+    <!-- 通用查询映射结果 -->
+   <!--  <resultMap id="BaseResultMap" type="com.wjj.application.entity.Test">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="description" property="description" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="number" property="number" />
+        <result column="lifecycle" property="lifecycle" />
+        <result column="dekes" property="dekes" />
+    </resultMap> -->
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, description, create_time AS createTime, update_time AS updateTime, number, lifecycle, dekes
+    </sql>
+	<!-- 查询列表 -->
+	<select id="selectMarketingActiveList" resultType="com.wjj.application.entity.marketing.MarketingActive">
+		select
+			id,
+			active_name,
+			update_time,
+			update_human,
+			main_path
+		FROM
+			marketing_active 
+	</select>
+	
+	<!-- 查看详情 -->
+	<select id="selectMarketingActiveDetail" parameterType="com.wjj.application.entity.marketing.MarketingActive" resultType="com.wjj.application.dto.marketing.MarketingActiveDto">
+		select
+			id,
+			active_name,
+			update_time,
+			update_human,
+			main_path
+		FROM
+			marketing_active 
+		where 1=1
+		<if test="id!=null and id!=''">
+			and id=#{id}
+		</if>
+	</select>
+	
+	<update id="updateMarketingActive" parameterType="com.wjj.application.entity.marketing.MarketingActive">
+		UPDATE marketing_active
+		 <trim prefix="set" suffixOverrides=",">
+		  <if test="activeName!=null and activeName!=''">
+		  	active_name=#{activeName},
+		  </if>
+		  <if test="mainPath!=null and mainPath!=''">
+		  	main_path=#{mainPath},
+		  </if>
+		   <if test="updateTime!=null and updateTime!=''">
+		  	update_time=#{updateTime},
+		  </if>
+		   <if test="updateHuman!=null and updateHuman!=''">
+		  	update_human=#{updateHuman},
+		  </if>
+		 </trim>
+ 	WHERE id=#{id}
+	</update>
+	
+	
+</mapper>

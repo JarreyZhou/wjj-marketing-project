@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjj.application.mapper.pennyRob.MkGoodsSkuMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wjj.application.entity.pennyRob.MkGoodsSku">
+        <id column="id" property="id" />
+        <result column="spu_id" property="spuId" />
+        <result column="guige_json" property="guigeJson" />
+        <result column="status" property="status" />
+        <result column="create_by" property="createBy" />
+        <result column="create_date" property="createDate" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_date" property="updateDate" />
+        <result column="remarks" property="remarks" />
+        <result column="del_flag" property="delFlag" />
+        <result column="version" property="version" />
+        <result column="goods_stock" property="goodsStock" />
+        <result column="stock" property="stock" />
+        <result column="remain_stock" property="remainStock" />
+        <result column="sale_price" property="salePrice" />
+        <result column="line_price" property="linePrice" />
+        <result column="eclp_no" property="eclpNo" />
+        <result column="detail_param" property="detailParam" />
+        <result column="app_simple_path" property="appSimplePath" />
+        <result column="supplier" property="supplier" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, spu_id AS spuId, guige_json AS guigeJson, status, create_by AS createBy, create_date AS createDate, update_by AS updateBy, update_date AS updateDate, remarks, del_flag AS delFlag, version,
+        stock,remain_stock AS remainStock
+    </sql>
+    
+   
+	<select id="selectSkuByGoodsSkuId"
+		resultType="com.wjj.application.entity.pennyRob.MkGoodsSku"
+		parameterType="int">
+		select
+		<include refid="Base_Column_List"></include>
+		from mk_goods_sku where goods_sku_id = #{skuid}
+	</select>
+</mapper>

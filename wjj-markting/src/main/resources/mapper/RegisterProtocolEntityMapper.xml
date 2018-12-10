@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjj.application.mapper.protocol.RegisterProtocolEntityMapper">
+
+    <!-- 通用查询映射结果 -->
+   <!--  <resultMap id="BaseResultMap" type="com.wjj.application.entity.Test">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="description" property="description" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="number" property="number" />
+        <result column="lifecycle" property="lifecycle" />
+        <result column="dekes" property="dekes" />
+    </resultMap> -->
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, description, create_time AS createTime, update_time AS updateTime, number, lifecycle, dekes
+    </sql>
+    
+   <!-- 查询全部 -->
+   <select id="selectRegisterProtocolEntityList" parameterType="com.wjj.application.entity.protocol.RegisterProtocolEntity" resultType="com.wjj.application.entity.protocol.RegisterProtocolEntity">
+   	select
+		id,
+		name,
+		update_time,
+		remark
+	FROM
+		register_protocol
+	where 1=1
+	<if test="id!=null and id!=''">
+		and id=#{id}
+	</if>
+   </select>
+   
+   <!-- 跟新 -->
+   <update id="updateRegisterProtocolEntity" parameterType="com.wjj.application.entity.protocol.RegisterProtocolEntity"  >
+   	update 
+   	register_protocol
+   	set name=#{name},
+   	update_time=sysdate(),
+   	remark=#{remark}
+   	where id=#{id}
+   </update>
+   
+   
+   
+</mapper>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjj.application.mapper.video.VideoGoodsMapper">
+
+    <!-- 通用查询映射结果 -->
+   <!--  <resultMap id="BaseResultMap" type="com.wjj.application.entity.Test">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="description" property="description" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="number" property="number" />
+        <result column="lifecycle" property="lifecycle" />
+        <result column="dekes" property="dekes" />
+    </resultMap> -->
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, description, create_time AS createTime, update_time AS updateTime, number, lifecycle, dekes
+    </sql>
+    
+   <delete id="deleteVideoGoodsByVideo" parameterType="java.lang.Long">
+		delete from video_goods where video_id =#{videoId}
+	</delete> 
+   
+   <select id="selectVideoGoodsByVideo" parameterType="java.lang.Long" resultType="com.wjj.application.entity.video.VideoGoodsEntity">
+   	select
+		id,
+		video_id,
+		goods_id,
+		goods_name,
+		min_price,
+		max_price,
+		move_pic_path,
+		store_num
+	FROM
+		video_goods
+	where  video_id =#{videoId}
+   </select>
+   
+   <select id="selectVideoGoodsAllGoodsId" resultType="java.lang.String">
+		SELECT
+		goods_id
+	FROM
+		video_goods
+	GROUP BY
+		goods_id having goods_id is not null
+	</select>
+   
+   <update id="updateVideoGoodsByList" parameterType="java.util.List">
+   		<foreach collection="list" item="item" separator=";">
+		update video_goods
+		 <trim prefix="set" suffixOverrides=",">
+		   <if test="item.goodsName!=null and item.goodsName!=''">
+		  	goods_name=#{item.goodsName},
+		  </if>
+		   <if test="item.storeNum!=null and item.storeNum!=''">
+		  	store_num=#{item.storeNum},
+		  </if>
+		   <if test="item.minPrice!=null and item.minPrice!=''">
+		  	min_price=#{item.minPrice},
+		  </if>
+		   <if test="item.picPath!=null and item.picPath!=''">
+		  	move_pic_path=#{item.picPath},
+		  </if>
+		   <if test="item.maxPrice!=null and item.maxPrice!=''">
+		  	max_price=#{item.maxPrice},
+		  </if>
+		 </trim>
+ 		WHERE goods_id=#{item.goodsId}
+	  </foreach>
+   </update>  
+   
+   <!-- 根据detail_id 和goods_id更新库存信息 -->
+	<update id="updateVideoGoodsByGoodsId" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+			update video_goods
+			set store_num=store_num-#{item.saleNum}
+			where goods_id=#{item.goodsId}
+		</foreach>
+	</update>
+	<!-- 跟新信息mq -->
+	<update id="updateVideoGoodsByUpdateGoodsBase" parameterType="com.wjj.application.dto.GoodsMainInfoDto">
+		update video_goods
+		 <trim prefix="set" suffixOverrides=",">
+		   <if test="goodsName!=null and goodsName!=''">
+		  	goods_name=#{goodsName},
+		  </if>
+		   <if test="totalNum!=null and totalNum!=''">
+		  	store_num=#{totalNum},
+		  </if>
+		   <if test="salePrice!=null and salePrice!=''">
+		  	min_price=#{salePrice},
+		  </if>
+		   <if test="movePicPath!=null and movePicPath!=''">
+		  	move_pic_path=#{movePicPath},
+		  </if>
+		   <if test="linePrice!=null and linePrice!=''">
+		  	max_price=#{linePrice},
+		  </if>
+		 </trim>
+ 		WHERE goods_id=#{goodsId}
+	</update>
+	
+	<!-- 商品下架删除商品信息 -->
+	<delete id="deleteVideoGoodsByUpdateGoodsBase"  parameterType="java.util.List">
+		delete from  video_goods where 1=1
+		<foreach collection="list" index="goodsList" item="item" open="and goods_id in (" separator="," close=")">
+                #{item}       
+        </foreach>  
+	</delete>
+   
+     
+   <select id="selectVideoGoodsByVideo" parameterType="java.lang.Long" resultType="com.wjj.application.entity.video.VideoGoodsEntity">
+   	select
+		id,
+		video_id,
+		goods_id,
+		goods_name,
+		min_price,
+		max_price,
+		move_pic_path,
+		store_num
+	FROM
+		video_goods
+	where  video_id =#{videoId}
+   </select>
+</mapper>

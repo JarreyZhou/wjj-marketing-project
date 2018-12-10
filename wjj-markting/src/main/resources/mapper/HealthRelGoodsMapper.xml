@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjj.application.mapper.infomation.HealthRelGoodsMapper">
+
+    <!-- 通用查询映射结果 -->
+   <!--  <resultMap id="BaseResultMap" type="com.wjj.application.entity.RelGoods">
+        <result column="rel_id" property="relId" />
+        <result column="goods_name" property="goodsName" />
+        <result column="ico_path" property="icoPath" />
+        <result column="body_type" property="bodyType" />
+        <result column="sex" property="sex" />
+        <result column="sale_price" property="salePrice" />
+        <result column="line_price" property="linePrice" />
+        <result column="total_num" property="totalNum" />
+        <result column="sale_num" property="saleNum" />
+        <result column="goods_id" property="goodsId" />
+         <result column="max_price" property="maxPrice" />
+    </resultMap> -->
+    
+    <delete id="deleteHealthRelGoodsByHealthId" parameterType="java.lang.Long">
+    	delete  from health_rel_goods where health_id =#{healthId}
+    </delete>
+    
+    <select id="selectHealthRelGoodsByHealthId" parameterType="java.lang.Long" resultType="com.wjj.application.entity.information.HealthRelGoods">
+    	SELECT
+			id,
+			goods_id,
+			goods_name,
+			sale_price,
+			max_price,
+			health_id
+		FROM
+			health_rel_goods
+		where health_id =#{healthId}
+    </select>
+    
+      <select id="selectHealthRelGoodsAllGoodsId" resultType="java.lang.String">
+		SELECT
+		goods_id
+	FROM
+		health_rel_goods
+	GROUP BY
+		goods_id having goods_id is not null
+	</select>
+    
+    
+     <update id="updateHealthRelGoodsByList" parameterType="java.util.List">
+   		<foreach collection="list" item="item" separator=";">
+		update health_rel_goods
+		 <trim prefix="set" suffixOverrides=",">
+		   <if test="item.goodsName!=null and item.goodsName!=''">
+		  	goods_name=#{item.goodsName},
+		  </if>
+		   <if test="item.minPrice!=null and item.minPrice!=''">
+		  	sale_price=#{item.minPrice},
+		  </if>
+		   <if test="item.maxPrice!=null and item.maxPrice!=''">
+		  	max_price=#{item.maxPrice},
+		  </if>
+		 </trim>
+ 		WHERE goods_id=#{item.goodsId}
+	  </foreach>
+   </update>
+
+	<!-- 商品应用更改商品信息 -->
+	<update id="updateHealthRelGoodsByGoodsMain" parameterType="com.wjj.application.dto.GoodsMainInfoDto">
+		update health_rel_goods
+		 <trim prefix="set" suffixOverrides=",">
+		   <if test="goodsName!=null and goodsName!=''">
+		  	goods_name=#{goodsName},
+		  </if>
+		   <if test="salePrice!=null and salePrice!=''">
+		  	sale_price=#{salePrice},
+		  </if>
+		   <if test="linePrice!=null and linePrice!=''">
+		  	max_price=#{linePrice},
+		  </if>
+		 </trim>
+ 		WHERE goods_id=#{goodsId}
+	</update>
+	
+	<!--商品应用下架商品信息 -->
+	<delete id="deleteHealthRelGoods" parameterType="java.util.List">
+		delete from health_rel_goods where 1=1
+		<foreach collection="list" index="goodsList" item="item" open="and goods_id in (" separator="," close=")">
+                #{item}       
+        </foreach>  
+	</delete>
+   
+</mapper>

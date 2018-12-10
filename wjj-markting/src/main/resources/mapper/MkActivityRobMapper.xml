@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjj.application.mapper.pennyRob.MkActivityRobMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wjj.application.entity.pennyRob.MkActivityRob">
+        <id column="id" property="id" />
+        <result column="activity_id" property="activityId" />
+        <result column="sponsor_id" property="sponsorId" />
+        <result column="user_id" property="userId" />
+        <result column="nickname" property="nickname" />
+        <result column="phone" property="phone" />
+        <result column="create_by" property="createBy" />
+        <result column="create_date" property="createDate" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_date" property="updateDate" />
+        <result column="remarks" property="remarks" />
+        <result column="del_flag" property="delFlag" />
+        <result column="version" property="version" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, activity_id AS activityId, sponsor_id AS sponsorId, user_id AS userId, nickname, phone, create_by AS createBy, create_date AS createDate, update_by AS updateBy, update_date AS updateDate, remarks, del_flag AS delFlag, version
+    </sql>
+
+    <select id="selectHelpRobList" resultType="com.wjj.application.entity.pennyRob.MkActivityRob">
+        select
+        <include refid="Base_Column_List" />
+        from mk_activity_rob
+        <where>
+            <if test="sponsorId != null and sponsorId !=''">
+                sponsor_id = #{sponsorId}
+            </if>
+        </where>
+        order by create_date desc
+    </select>
+    <select id="selectActivityRobList" parameterType="com.wjj.application.dto.pennyRob.MkActivityRobDTO" resultType="com.wjj.application.dto.pennyRob.MkActivityRobDTO">
+        select id, activity_id, sponsor_id, user_id, nickname, phone, create_by, create_date, update_by, update_date, remarks, del_flag, version
+        from mk_activity_rob
+        where (select spu_id from mk_activity_sponsor where id = #{sponsorId}) = #{spuId}
+        and sponsor_id = #{sponsorId}
+        and activity_id = #{activityId}
+    </select>
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjj.application.mapper.infomation.HealthTagMapper">
+
+    <!-- 通用查询映射结果 -->
+   <!--  <resultMap id="BaseResultMap" type="com.wjj.application.entity.RelGoods">
+        <result column="rel_id" property="relId" />
+        <result column="goods_name" property="goodsName" />
+        <result column="ico_path" property="icoPath" />
+        <result column="body_type" property="bodyType" />
+        <result column="sex" property="sex" />
+        <result column="sale_price" property="salePrice" />
+        <result column="line_price" property="linePrice" />
+        <result column="total_num" property="totalNum" />
+        <result column="sale_num" property="saleNum" />
+        <result column="goods_id" property="goodsId" />
+         <result column="max_price" property="maxPrice" />
+    </resultMap> -->
+
+	<delete id="deleteHealthTagById" parameterType="java.lang.Long">
+		delete from health_tag where health_id =#{healthId}
+	</delete>
+	
+	<select id="selectHealthTagById" parameterType="java.lang.Long" resultType="com.wjj.application.entity.information.HealthParentTag">
+		select
+			id,
+			tag_type,
+			tag_value,
+			tag_name,
+			tag_level,
+			parent_id,
+			health_id,
+			tag_type_name
+		FROM
+			health_tag
+		WHERE
+			tag_level = '1'
+		AND health_id = #{healthId}
+	</select>
+	
+	
+	<select id="selectHealthTagByParentId" parameterType="java.lang.Long" resultType="com.wjj.application.entity.information.HealthTag">
+		select
+			id,
+			tag_type,
+			tag_value,
+			tag_name,
+			tag_level,
+			parent_id,
+			health_id,
+			tag_type_name
+		FROM
+			health_tag
+		WHERE
+			tag_level = '2'
+		AND parent_id = #{parentId}
+	</select>
+	
+	
+   
+</mapper>

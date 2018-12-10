@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjj.application.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wjj.application.entity.User">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="age" property="age" />
+        <result column="test_id" property="testId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, age, test_id AS testId
+    </sql>
+    
+    <select id="pageList" resultType="com.wjj.application.entity.User">
+    	select * from user
+    </select>
+    
+    <select id="userList" resultType="com.wjj.application.vo.UserTestVO" parameterType="java.lang.String">
+    	select 
+    	<include refid="Base_Column_List"/> 
+    	from user where 1=1 
+    	<if test="name != null and name != ''">
+    		and name like CONCAT('%', '${name}', '%' ) 
+    	</if>
+    </select>
+
+</mapper>

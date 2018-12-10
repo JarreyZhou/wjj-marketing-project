@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjj.application.mapper.infomation.HealthInfomationTypeMapper">
+
+    <!-- 通用查询映射结果 -->
+   <!--  <resultMap id="BaseResultMap" type="com.wjj.application.entity.RelGoods">
+        <result column="rel_id" property="relId" />
+        <result column="goods_name" property="goodsName" />
+        <result column="ico_path" property="icoPath" />
+        <result column="body_type" property="bodyType" />
+        <result column="sex" property="sex" />
+        <result column="sale_price" property="salePrice" />
+        <result column="line_price" property="linePrice" />
+        <result column="total_num" property="totalNum" />
+        <result column="sale_num" property="saleNum" />
+        <result column="goods_id" property="goodsId" />
+         <result column="max_price" property="maxPrice" />
+    </resultMap> -->
+   
+   	<select id="selectHealthInfomationTypeList" parameterType="com.wjj.application.entity.information.HealthInfomationType" resultType="com.wjj.application.entity.information.HealthInfomationType">
+   		select
+			a.id,
+			a.name, 
+			case WHEN (select count(0) from health_infomation where type_id=a.id)  >0 THEN  '1' else  '0' end as type_status
+		FROM
+			health_infomation_type a
+		WHERE
+			1 = 1
+		<if test="name!=null and name!=''">
+			and a.name like CONCAT ('%',#{name},'%')
+		</if>
+		<if test="typeStatus!=null and typeStatus!=''">
+			and type_status =#{typeStatus}
+		</if>
+   	</select>
+   	
+   	<select id="selectInformationByTypeId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+   		select count(0) from health_infomation where type_id=#{typeId}
+   	</select>
+   	
+   	
+   	
+</mapper>

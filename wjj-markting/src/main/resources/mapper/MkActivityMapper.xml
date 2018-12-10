@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.wjj.application.mapper.pennyRob.MkActivityMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.wjj.application.entity.pennyRob.MkActivity">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="start_time" property="startTime" />
+		<result column="end_time" property="endTime" />
+		<result column="oa_num" property="oaNum" />
+		<result column="rob_limit" property="robLimit" />
+		<result column="help_indate" property="helpIndate" />
+		<result column="weixin_wenan" property="weixinWenan" />
+		<result column="publicity_pic" property="publicityPic" />
+		<result column="regulation" property="regulation" />
+		<result column="initiate_count" property="initiateCount" />
+		<result column="help_count" property="helpCount" />
+		<result column="order_count" property="orderCount" />
+		<result column="status" property="status" />
+		<result column="create_by" property="createBy" />
+		<result column="create_date" property="createDate" />
+		<result column="update_by" property="updateBy" />
+		<result column="update_date" property="updateDate" />
+		<result column="remarks" property="remarks" />
+		<result column="del_flag" property="delFlag" />
+		<result column="version" property="version" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, name, start_time AS startTime, end_time AS endTime,
+		oa_num AS oaNum,
+		rob_limit AS robLimit, help_indate AS helpIndate,
+		weixin_wenan AS
+		weixinWenan, publicity_pic AS publicityPic, regulation,
+		initiate_count
+		AS initiateCount, help_count AS helpCount, order_count
+		AS orderCount,
+		status, create_by AS createBy, create_date AS
+		createDate, update_by AS
+		updateBy, update_date AS updateDate, remarks,
+		del_flag AS delFlag,
+		version
+	</sql>
+
+	<select id="list" resultMap="BaseResultMap">
+		select * from mk_activity where
+		status = 3 union (select * from mk_activity where status = 2 ORDER BY
+		start_time limit 0,1);
+	</select>
+
+	<select id="selectPageList" resultMap="BaseResultMap"
+		parameterType="com.wjj.application.dto.pennyRob.MkActivityDTO">
+		select
+		id, name, start_time, end_time,
+		oa_num,
+		rob_limit, help_indate,
+		weixin_wenan, publicity_pic, regulation,
+		initiate_count, help_count, order_count,
+		status, create_by, create_date, update_by, update_date, remarks,
+		del_flag,
+		version
+		from mk_activity
+		where 1=1
+			<if test="name != null and name !=''">
+				and name = #{name}
+			</if>
+			<if test="status != null and status !=''">
+				and status = #{status}
+			</if>
+		order by update_date desc
+		<if test="pageSize != null and pageSize > 0">
+			limit #{limit} , #{pageSize}
+		</if>
+	</select>
+
+	<select id="selectPageCount" resultType="int"
+		parameterType="com.wjj.application.dto.pennyRob.MkActivityDTO">
+		select count(1)
+		from mk_activity
+		where 1=1
+			<if test="name != null and name !=''">
+				and name = #{name}
+			</if>
+			<if test="status != null and status !=''">
+				and status = #{status}
+			</if>
+	</select>
+
+	<select id="selectAllActivity" resultMap="BaseResultMap">
+		select * from mk_activity
+	</select>
+
+</mapper>

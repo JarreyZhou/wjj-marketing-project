@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjj.application.mapper.marketing.MarketingGoodsMapper">
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, description, create_time AS createTime, update_time AS updateTime, number, lifecycle, dekes
+    </sql>
+    
+    
+	<!--  根据活动编号查询商品-->
+	<select id="selectMarketingGoodsList" parameterType="java.lang.Long" resultType="com.wjj.application.entity.marketing.MarketingGoods">
+		select
+			id,
+			active_id,
+			goods_id,
+			goods_name,
+			detail_id,
+			detail_name,
+			classify_name,
+			store_num,
+			sale_price,
+			sort_id,
+			new_human_price,
+			discount,
+			max_price,
+			min_price,
+			pic_path,
+			goods_type_name,
+			body_type,
+			sex,
+			sale_num
+		FROM
+			marketing_goods 
+		where active_id=#{activeId}
+		order by sort_id 
+	</select>
+	
+	<!-- 排序 -->
+	<update id="updateMarketingGoodsPart" parameterType="com.wjj.application.entity.marketing.MarketingGoods">
+		update marketing_goods
+		 <trim prefix="set" suffixOverrides=",">
+		  <if test="sortId!=null and sortId!=''">
+		  	sort_id=#{sortId},
+		  </if>
+		   <if test="newHumanPrice!=null and newHumanPrice!=''">
+		  	new_human_price=#{newHumanPrice},
+		  </if>
+		   <if test="discount!=null and discount!=''">
+		  	discount=#{discount},
+		  </if>
+		 </trim>
+ 	WHERE id=#{id}
+	</update>
+	
+	<!-- 根据类型删除相关商品 -->
+	<delete id="deleteMarketingGoodsByActiveId" parameterType="java.lang.Long">
+		delete from marketing_goods where active_id=#{activeId}
+	</delete>
+
+    <!-- app查询 -->
+    <select id="selectMarketingGoodsForApp" parameterType="com.wjj.application.dto.marketing.MarketingGoodsDto" resultType="com.wjj.application.dto.marketing.MarketingGoodsDto">
+    	select
+			id,
+			active_id,
+			goods_id,
+			goods_name,
+			detail_id,
+			detail_name,
+			classify_name,
+			store_num,
+			sale_price,
+			sort_id,
+			discount,
+			max_price,
+			min_price,
+			pic_path,
+			sale_num,
+			body_type,
+			sex,
+			#{activeType} as active_type,
+			min_price as new_human_price
+		FROM
+			marketing_goods 
+		where active_id=#{activeId}
+		order by sort_id desc
+		limit #{pageNo},#{pageSize}
+    </select>
+	
+	<select  id="selectMarketingGoodsForAppCount" parameterType="com.wjj.application.dto.marketing.MarketingGoodsDto" resultType="java.lang.Integer">
+		select
+			count(0)
+		FROM
+			marketing_goods 
+		where active_id=#{activeId}
+	</select>
+	
+	<!-- 查询商品所有的商品 -->
+	<!--  -->
+	<select id="selectMarketingAllGoodsId" resultType="java.lang.String">
+		SELECT
+		goods_id
+	FROM
+		(
+			SELECT
+				a.goods_id
+			FROM
+				marketing_goods a
+			WHERE
+				a.detail_id IS NULL
+		) tem
+	GROUP BY
+		goods_id
+	</select>
+	
+	<!-- 查看商品规格 -->
+	<select id="selectMarketingAllDetailId" resultType="java.lang.Long">
+		select
+			detail_id
+		FROM
+			marketing_goods
+		GROUP BY detail_id having detail_id is not null
+	</select>
+	
+	
+	<!-- 根据detailId批量更新商品信息 -->
+	<update id="updateMarketingDetailList" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+		update marketing_goods
+		 <trim prefix="set" suffixOverrides=",">
+		  <if test="item.detailName!=null and item.detailName!=''">
+		  	detail_name=#{item.detailName},
+		  </if>
+		   <if test="item.goodsId!=null and item.goodsId!=''">
+		  	goods_id=#{item.goodsId},
+		  </if>
+		   <if test="item.goodsName!=null and item.goodsName!=''">
+		  	goods_name=#{item.goodsName},
+		  </if>
+		   <if test="item.classifyName!=null and item.classifyName!=''">
+		  	classify_name=#{item.classifyName},
+		  </if>
+		   <if test="item.storeNum!=null and item.storeNum!=''">
+		  	store_num=#{item.storeNum},
+		  </if>
+		   <if test="item.salePrice!=null and item.salePrice!=''">
+		  	sale_price=#{item.salePrice},
+		  </if>
+		   <if test="item.minPrice!=null and item.minPrice!=''">
+		  	min_price=#{item.minPrice},
+		  </if>
+		   <if test="item.picPath!=null and item.picPath!=''">
+		  	pic_path=#{item.picPath},
+		  </if>
+		   <if test="item.discount!=null and item.discount!=''">
+		  	discount=#{item.discount},
+		  </if>
+		 </trim>
+ 		WHERE detail_id=#{item.detailId}
+	  </foreach>
+	</update>
+	
+	<!-- 根据goodsId批量更新商品信息 -->
+	<update id="updateMarketingGoodsList" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+		update marketing_goods
+		 <trim prefix="set" suffixOverrides=",">
+		   <if test="item.goodsName!=null and item.goodsName!=''">
+		  	goods_name=#{item.goodsName},
+		  </if>
+		   <if test="item.classifyName!=null and item.classifyName!=''">
+		  	classify_name=#{item.classifyName},
+		  </if>
+		   <if test="item.storeNum!=null and item.storeNum!=''">
+		  	store_num=#{item.storeNum},
+		  </if>
+		   <if test="item.storeNum!=null and item.storeNum!=''">
+		  	sale_num=#{item.saleNum},
+		  </if>
+		   <if test="item.minPrice!=null and item.minPrice!=''">
+		  	min_price=#{item.minPrice},
+		  </if>
+		   <if test="item.picPath!=null and item.picPath!=''">
+		  	pic_path=#{item.picPath},
+		  </if>
+		   <if test="item.maxPrice!=null and item.maxPrice!=''">
+		  	max_price=#{item.maxPrice},
+		  </if>
+		 </trim>
+ 		WHERE goods_id=#{item.goodsId}
+	  </foreach>
+	</update>
+	
+	<!-- 根据detail_id 和goods_id更新库存信息 -->
+	<update id="updateGiftUpdateStoreDTOByGoodsIdAndDetailId" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+			update marketing_goods
+			set store_num=store_num-#{item.saleNum},
+			sale_num=sale_num+#{item.saleNum}
+			where (goods_id=#{item.goodsId} and detail_id=#{item.detailId}) or goods_id=#{item.goodsId}
+		</foreach>
+	</update>
+	
+	<!-- 根据商品编号更新 -->
+	<update id="updateMarketingGoodsByMq" parameterType="com.wjj.application.dto.GoodsMainInfoDto">
+		update marketing_goods
+		 <trim prefix="set" suffixOverrides=",">
+		   <if test="goodsName!=null and goodsName!=''">
+		  	goods_name=#{goodsName},
+		  </if>
+		   <if test="levelThreeName!=null and levelThreeName!=''">
+		  	classify_name=#{levelThreeName},
+		  </if>
+		  	store_num=#{totalNum},
+		    sale_num=#{saleNum},
+		   <if test="salePrice!=null and salePrice!=''">
+		  	min_price=#{salePrice},
+		  </if>
+		   <if test="movePicPath!=null and movePicPath!=''">
+		  	pic_path=#{movePicPath},
+		  </if>
+		   <if test="linePrice!=null and linePrice!=''">
+		  	max_price=#{maxPrice},
+		  </if>
+		   <if test="sex!=null and sex!=''">
+		  	sex=#{sex},
+		  </if>
+		  <if test="bodyType!=null and bodyType!=''">
+		  	body_type=#{bodyType},
+		  </if>
+		 </trim>
+ 		WHERE goods_id=#{goodsId}
+	</update>
+	
+	<!-- 根据goodsId批量更新商品信息 -->
+	<!-- <update id="updateMarketingGoodsListByMq" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+		update marketing_goods
+		 <trim prefix="set" suffixOverrides=",">
+		   <if test="item.goodsName!=null and item.goodsName!=''">
+		  	goods_name=#{item.goodsName},
+		  </if>
+		   <if test="item.classifyName!=null and item.classifyName!=''">
+		  	classify_name=#{item.classifyName},
+		  </if>
+		   <if test="item.storeNum!=null and item.storeNum!=''">
+		  	store_num=#{item.storeNum},
+		  </if>
+		   <if test="item.minPrice!=null and item.minPrice!=''">
+		  	min_price=#{item.minPrice},
+		  </if>
+		   <if test="item.picPath!=null and item.picPath!=''">
+		  	pic_path=#{item.picPath},
+		  </if>
+		   <if test="item.maxPrice!=null and item.maxPrice!=''">
+		  	max_price=#{item.maxPrice},
+		  </if>
+		 </trim>
+ 		WHERE goods_id=#{item.goodsId}
+	  </foreach>
+	</update> -->
+	
+	<!-- 根据detailId批量更新商品信息 -->
+	<update id="updateMarketingDetailListByMq" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+		update marketing_goods
+		 <trim prefix="set" suffixOverrides=",">
+		  <if test="item.detailName!=null and item.detailName!=''">
+		  	detail_name=#{item.detailName},
+		  </if>
+		  
+		  	store_num=#{item.storeNum},
+		    
+		   <if test="item.salePrice!=null and item.salePrice!=''">
+		  	sale_price=#{item.salePrice},
+		  </if>
+		   <if test="item.linePrice!=null and item.linePrice!=''">
+		  	max_price=#{item.linePrice},
+		  </if>
+		   <if test="item.salePrice!=null and item.salePrice!='' and item.linePrice!=null and item.linePrice!=''">
+		  	discount= ROUND(#{item.salePrice} * 10 / #{item.linePrice},1) ,
+		  </if>
+		 </trim>
+ 		WHERE detail_id=#{item.detailId}
+	  </foreach>
+	</update>
+	
+	<delete id="deleteMarketingDetailListByMq" parameterType="java.util.List">
+		delete from marketing_goods where 1=1
+		<foreach collection="list" index="goodsList" item="item" open="and goods_id in (" separator="," close=")">
+                #{item}       
+        </foreach>  
+	</delete>
+	
+	<delete id="deleteMarketingDetailListForTimer" parameterType="java.util.List">
+		delete from marketing_goods where 1=1
+		<foreach collection="list" index="detailIdList" item="item" open="and detail_id in (" separator="," close=")">
+                #{item}       
+        </foreach>  
+	</delete>
+	
+	<!-- 根据活动编号查询对应的规格编号 -->
+	<select id="selectDetaiListByActiveId" parameterType="java.lang.Long" resultType="java.lang.Long">
+		select detail_id from marketing_goods where active_id=#{activeId}
+	</select>
+	
+	<!-- 根据活动类型取商品编号及其一分抢商品 -->
+	<select id="selectActiveGoodsIdListAndOnePenctByList" parameterType="java.util.List" resultType="java.lang.String">
+		SELECT
+			goods_id
+		FROM
+			(
+				SELECT
+					good_id AS goods_id
+				FROM
+					mk_goods_spu
+			) tab2
+		GROUP BY
+			goods_id
+		UNION
+			SELECT
+				goods_id
+			FROM
+				(
+					SELECT
+						goods_id
+					FROM
+						marketing_goods
+					WHERE
+						<foreach collection="list" index="activeIdList" item="item" open=" active_id  in (" separator="," close=")">
+		                #{item}       
+		        		</foreach> 
+				) tabl
+			GROUP BY
+				goods_id
+	</select>
+	<!-- 查询所有的一分抢商品 -->
+	<select id="selectActiveGoodsIdListByList" parameterType="java.util.List"  resultType="java.lang.String">
+			SELECT
+				goods_id
+			FROM
+				(
+					SELECT
+						goods_id
+					FROM
+						marketing_goods
+					WHERE
+						<foreach collection="list" index="activeIdList" item="item" open=" active_id  in (" separator="," close=")">
+		                #{item}       
+		        		</foreach>  
+				) tabl
+			GROUP BY
+				goods_id
+	</select>
+	
+	<!-- 按照商品类型查询商品 -->
+	<select id="selectGoodsDetailBGoodsId" parameterType="com.wjj.application.dto.marketing.MarketingGoodsDto" resultType="com.wjj.application.dto.marketing.MarketingGoodsDto">
+		SELECT
+			goods_id,
+			  max(goods_name) goods_name,
+			  min(new_human_price) as new_human_price,
+			  min(min_price) as min_price,
+			  max(max_price) as max_price,
+			  max(pic_path) as pic_path,
+			  max(sort_id) as sort_id,
+			  max(store_num) as store_num,
+			  #{activeType} as active_type
+			FROM
+				(
+					SELECT
+						goods_id,
+						goods_name,
+						new_human_price,
+						min_price,
+						max_price,
+						pic_path,
+						sort_id,
+						store_num
+					FROM
+						marketing_goods
+						WHERE
+					active_id = #{activeId}
+				) tab1
+			group by goods_id 
+	 order by sort_id desc	
+		limit #{pageNo},#{pageSize}
+	</select>
+	
+	<select id="selectGoodsDetailBGoodsIdCount" parameterType="com.wjj.application.dto.marketing.MarketingGoodsDto" resultType="java.lang.Integer">
+		select count(0)
+		from (
+		SELECT
+		count(0)
+		FROM
+			(
+				SELECT
+					goods_id
+				FROM
+					marketing_goods
+				WHERE
+					active_id = #{activeId}
+			) marketing_goods
+		group by goods_id ) tab1
+		
+	</select>
+	
+	<!-- 根据活动编号查询商品编号 -->
+	<select id="selectGoodsIdListByActiveId" resultType="java.lang.String">
+		select goods_id from (select goods_id from marketing_goods where active_id = #{activeId}) tab1 group by goods_id
+	</select>
+	
+	<select id="selectMInNewHUmanPriceAndGoodsId" parameterType="java.lang.Long" resultType="com.wjj.application.entity.marketing.MarketingGoods">
+		SELECT
+		min(new_human_price) as new_human_price,
+		goods_id
+	FROM
+		(
+			SELECT
+				new_human_price,
+				goods_id
+			FROM
+				marketing_goods
+			WHERE
+				active_id = 1
+		) tab1
+	GROUP BY
+		goods_id
+	</select>
+	
+	<!-- 查询规格中skuid级别的商品 -->
+	<select id="selctMinAndMaxPriceGoodsIdByDetailId" parameterType="java.lang.Long" resultType="java.lang.String">
+		SELECT
+			goods_id
+		FROM
+			(
+				SELECT
+					goods_id
+				FROM
+					marketing_goods
+				WHERE
+					active_id = #{activeId}
+			) tem
+		GROUP BY
+			goods_id
+		HAVING
+			goods_id IS NOT NULL
+	</select>
+	
+	<update id="updateMinAndMaxPriceByGoodsId" parameterType="java.util.List" >
+		<foreach collection="list" item="item" separator=";">
+        update  
+          marketing_goods
+        SET
+          max_price =#{item.maxPrice},
+          min_price=#{item.minPrice}
+        WHERE
+          goods_id=#{item.goodsId}  
+      </foreach>
+	</update>
+	
+	
+	<!--  根据活动编号查询商品-->
+	<select id="selectMarketingGoodsListNew"  resultType="com.wjj.application.entity.marketing.MarketingGoods">
+		select
+			goods_id,
+			goods_name,
+			store_num,
+			sale_price,
+			new_human_price,
+			max_price,
+			min_price,
+			pic_path
+		FROM
+			marketing_goods 
+		where active_id='8'
+		limit 0,6
+	</select>
+	
+</mapper>
